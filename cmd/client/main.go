@@ -78,7 +78,7 @@ func main() {
 	port := flag.Int("p", 8081, "port")
 	flag.Parse()
 	fmt.Println("Connecting to server at port:", *port)
-	c, err := NewClient("127.0.0.1:" + fmt.Sprintf("%d", *port))
+	c, err := NewClient("localhost:" + fmt.Sprintf("%d", *port))
 	if err != nil {
 		log.Fatalln("Client Error:", err.Error())
 	}
@@ -91,35 +91,35 @@ func main() {
 		c.WG.Done()
 	}()
 
-	//err = c.Put(context.Background(), "name", fmt.Sprintf("Hardik"))
-	//if err != nil {
-	//	fmt.Println("Client Error:", err.Error())
-	//}
-	//
-	//err = c.Put(context.Background(), "surname", fmt.Sprintf("Roongta"))
-	//if err != nil {
-	//	fmt.Println("Client Error:", err.Error())
-	//}
-	//
-	//err = c.Put(context.Background(), "city", fmt.Sprintf("Guwahati"))
-	//if err != nil {
-	//	fmt.Println("Client Error:", err.Error())
-	//}
-	//
-	//err = c.Put(context.Background(), "clg", "iitg")
-	//if err != nil {
-	//	fmt.Println("Client Error:", err.Error())
-	//}
+	err = c.Put(context.Background(), "name", fmt.Sprintf("Hardik"))
+	if err != nil {
+		fmt.Println("Client Error:", err.Error())
+	}
+
+	err = c.Put(context.Background(), "surname", fmt.Sprintf("Roongta"))
+	if err != nil {
+		fmt.Println("Client Error:", err.Error())
+	}
+
+	err = c.Put(context.Background(), "city", fmt.Sprintf("Guwahati"))
+	if err != nil {
+		fmt.Println("Client Error:", err.Error())
+	}
+
+	err = c.Put(context.Background(), "clg", "iitg")
+	if err != nil {
+		fmt.Println("Client Error:", err.Error())
+	}
 
 	err = c.Get(context.Background(), "name")
 	if err != nil {
 		fmt.Println("Client Error:", err.Error())
 	}
 
-	//err = c.Put(context.Background(), "color", fmt.Sprintf("Red"))
-	//if err != nil {
-	//	fmt.Println("Client Error:", err.Error())
-	//}
+	err = c.Put(context.Background(), "color", fmt.Sprintf("Red"))
+	if err != nil {
+		fmt.Println("Client Error:", err.Error())
+	}
 
 	err = c.Get(context.Background(), "color")
 	if err != nil {

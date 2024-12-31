@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/hardikroongta8/go_raft/internal/utils"
 	"io"
-	"log"
 	"net"
 	"sync"
 )
@@ -30,16 +29,12 @@ func (p *Peer) ReadData() error {
 	for {
 		parser := utils.NewReader(p.conn)
 		data, err := parser.Read()
-		log.Println("DATA:", string(data))
 		if err == io.EOF {
-			log.Println("EOF Error:", err.Error())
 			return nil
 		}
 		if err != nil {
-			log.Println("NON EOF Error:", err.Error())
-			continue
+			return err
 		}
-		log.Println("I AM HERE")
 		p.msgChannel <- Message{
 			data: data,
 			peer: p,

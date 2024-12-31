@@ -98,6 +98,7 @@ func (rf *Node) commitLogEntries() {
 		}
 		if acks > len(rf.nodes)/2 {
 			res := rf.sendMessageToFSM(rf.logs[rf.commitedLength].Message)
+			fmt.Println(res)
 			rf.ClientResponseChannel <- res
 			rf.commitedLength++
 		} else {

@@ -37,14 +37,13 @@ func NewCacheServer(port int, id raft.NodeID, raftNodes map[raft.NodeID]string) 
 
 func (s *CacheServer) Start(wg *sync.WaitGroup) {
 	defer wg.Done()
-	listener, err := net.Listen("tcp", "127.0.0.1:"+fmt.Sprintf("%d", s.port))
+	listener, err := net.Listen("tcp", "localhost:"+fmt.Sprintf("%d", s.port))
 	if err != nil {
 		fmt.Printf("[Node %d] Error starting the listener: %s\n", s.rf.ID, err.Error())
 		return
 	}
 	mux := cmux.New(listener)
 	grpcLn := mux.Match(cmux.HTTP2())
-	//grpcLn := mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
 	s.listener = mux.Match(cmux.Any())
 
 	s.wg.Add(4)
@@ -143,7 +142,6 @@ func (s *CacheServer) Quit() {
 	wg.Wait()
 	s.quitChannel <- struct{}{}
 	fmt.Printf("[Node %d] Closing TCP Listener...\n", s.rf.ID)
-	log.Println("Closing TCP listener...")
 	s.rf.Quit()
 	err := s.listener.Close()
 	if err != nil {
