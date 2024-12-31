@@ -3,7 +3,7 @@ package raft
 import (
 	"context"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/pkg/pb"
+	"github.com/hardikroongta8/go_raft/internal/pb"
 )
 
 func (rf *Node) replicateLog(followerID NodeID) {
@@ -52,8 +52,8 @@ func (rf *Node) appendEntries(prefixLen int32, leaderCommit int32, suffix []*pb.
 	}
 	if leaderCommit > rf.commitedLength {
 		for i := rf.commitedLength; i < leaderCommit; i++ {
-			go rf.sendMessageToFSM(rf.logs[i].Message)
-			// TODO: deliver rf.logs[i].Message to application
+			res := rf.sendMessageToFSM(rf.logs[i].Message)
+			fmt.Println(res)
 		}
 		rf.commitedLength = leaderCommit
 	}

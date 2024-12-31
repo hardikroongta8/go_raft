@@ -3,7 +3,7 @@ package raft
 import (
 	"context"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/pkg/pb"
+	pb2 "github.com/hardikroongta8/go_raft/internal/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net"
@@ -11,16 +11,16 @@ import (
 )
 
 type Transport struct {
-	srv     *grpc.Server             // listens to RPCs from its peers
-	clients map[NodeID]pb.RaftClient // maps peerID to raft client
-	peers   map[NodeID]string        // maps peerID to address
-	id      NodeID                   // nodeID
+	srv     *grpc.Server              // listens to RPCs from its peers
+	clients map[NodeID]pb2.RaftClient // maps peerID to raft client
+	peers   map[NodeID]string         // maps peerID to address
+	id      NodeID                    // nodeID
 	mu      sync.Mutex
 }
 
 func NewTransport(id NodeID, peers map[NodeID]string) *Transport {
 	return &Transport{
-		clients: make(map[NodeID]pb.RaftClient),
+		clients: make(map[NodeID]pb2.RaftClient),
 		peers:   peers,
 		id:      id,
 	}
@@ -28,7 +28,7 @@ func NewTransport(id NodeID, peers map[NodeID]string) *Transport {
 
 func (t *Transport) Start(srv *Node, ln net.Listener) {
 	t.srv = grpc.NewServer()
-	pb.RegisterRaftServer(t.srv, srv)
+	pb2.RegisterRaftServer(t.srv, srv)
 
 	fmt.Printf("[Node %d] Starting gRPC Server...\n", t.id)
 	if err := t.srv.Serve(ln); err != nil {
@@ -42,7 +42,7 @@ func (t *Transport) Stop() {
 	}
 }
 
-func (t *Transport) GetClient(peerID NodeID) (pb.RaftClient, error) {
+func (t *Transport) GetClient(peerID NodeID) (pb2.RaftClient, error) {
 	if client, ok := t.clients[peerID]; ok {
 		return client, nil
 	}
@@ -54,11 +54,11 @@ func (t *Transport) GetClient(peerID NodeID) (pb.RaftClient, error) {
 	if err != nil {
 		return nil, err
 	}
-	t.clients[peerID] = pb.NewRaftClient(conn)
+	t.clients[peerID] = pb2.NewRaftClient(conn)
 	return t.clients[peerID], nil
 }
 
-func (t *Transport) sendVoteRequest(ctx context.Context, pID NodeID, args *pb.VoteRequestArgs) (*pb.VoteResponse, error) {
+func (t *Transport) sendVoteRequest(ctx context.Context, pID NodeID, args *pb2.VoteRequestArgs) (*pb2.VoteResponse, error) {
 	client, err := t.GetClient(pID)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (t *Transport) sendVoteRequest(ctx context.Context, pID NodeID, args *pb.Vo
 	return client.VoteRequest(ctx, args)
 }
 
-func (t *Transport) sendLogRequest(ctx context.Context, pID NodeID, args *pb.LogRequestArgs) (*pb.LogResponse, error) {
+func (t *Transport) sendLogRequest(ctx context.Context, pID NodeID, args *pb2.LogRequestArgs) (*pb2.LogResponse, error) {
 	client, err := t.GetClient(pID)
 	if err != nil {
 		return nil, err

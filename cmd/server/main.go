@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/pkg/raft"
-	"github.com/hardikroongta8/go_raft/pkg/server"
+	"github.com/hardikroongta8/go_raft/internal/raft"
+	"github.com/hardikroongta8/go_raft/internal/server"
 	"sync"
 )
 

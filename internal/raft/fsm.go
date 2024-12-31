@@ -14,12 +14,12 @@ func (rf *Node) sendMessageToFSM(msg string) string {
 	case utils.GetCommand:
 		key := cmd.(utils.GetCommand).Key
 		val := rf.cache.Get(key)
-		return fmt.Sprintf("[Node %d] GET REQUEST: KEY = %s, VALUE = %s", rf.ID, key, val)
+		return fmt.Sprintf("[Node %d] GET: KEY = %s, VALUE = %s", rf.ID, key, val)
 	case utils.PutCommand:
 		key := cmd.(utils.PutCommand).Key
 		val := cmd.(utils.PutCommand).Val
 		rf.cache.Put(key, val)
-		return fmt.Sprintf("[Node %d] PUT REQUEST: KEY = %s, VALUE = %s", rf.ID, key, val)
+		return fmt.Sprintf("[Node %d] PUT: SUCCESS", rf.ID)
 	}
 	return fmt.Sprintf("[Node %d] INVALID MESSAGE FOR FSM", rf.ID)
 }

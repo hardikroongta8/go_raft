@@ -3,8 +3,8 @@ package server
 import (
 	"errors"
 	"fmt"
+	"github.com/hardikroongta8/go_raft/internal/raft"
 	"github.com/hardikroongta8/go_raft/internal/utils"
-	"github.com/hardikroongta8/go_raft/pkg/raft"
 	"github.com/soheilhy/cmux"
 	"log"
 	"net"

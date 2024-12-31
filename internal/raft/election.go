@@ -3,7 +3,7 @@ package raft
 import (
 	"context"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/pkg/pb"
+	"github.com/hardikroongta8/go_raft/internal/pb"
 	"math/rand"
 	"time"
 )
