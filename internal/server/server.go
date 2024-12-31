@@ -76,7 +76,7 @@ func (s *CacheServer) mainLoop() {
 		case conn := <-s.addPeerChannel:
 			s.attachPeer(conn)
 		case msg := <-s.msgChannel:
-			s.rf.ClientMessageChannel <- string(msg.data)
+			s.rf.ClientRequestChannel <- string(msg.data)
 			res := <-s.rf.ClientResponseChannel
 			err := msg.peer.WriteData([]byte(res))
 			if err != nil {

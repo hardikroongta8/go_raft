@@ -25,7 +25,7 @@ func (rf *Node) startElection() {
 		lastTerm = rf.logs[logLen-1].Term
 	}
 
-	for pID := range rf.peers {
+	for pID := range rf.nodes {
 		if pID == rf.ID {
 			continue
 		}
@@ -57,12 +57,12 @@ func (rf *Node) handleVoteResponse(res *pb.VoteResponse) {
 		rf.votesReceived[NodeID(res.VoterId)] = true
 		voteCnt := len(rf.votesReceived)
 		fmt.Printf("[Node %d] Votes count: %d\n", rf.ID, voteCnt)
-		if voteCnt > len(rf.peers)/2 {
+		if voteCnt > len(rf.nodes)/2 {
 			fmt.Printf("[Node %d] LEADER ELECTED FOR TERM %d\n", rf.ID, res.Term)
 			rf.currentRole = Leader
 			rf.currentLeader = rf.ID
 			rf.stopElectionTimer()
-			for followerID := range rf.peers {
+			for followerID := range rf.nodes {
 				if followerID == rf.ID {
 					continue
 				}

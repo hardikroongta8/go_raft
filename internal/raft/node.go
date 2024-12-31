@@ -3,9 +3,8 @@ package raft
 import (
 	"context"
 	"fmt"
-	pb2 "github.com/hardikroongta8/go_raft/internal/pb"
+	"github.com/hardikroongta8/go_raft/internal/pb"
 	"github.com/hardikroongta8/go_raft/internal/storage"
-	"log"
 	"net"
 	"sync"
 	"time"
@@ -25,7 +24,7 @@ type Node struct {
 	ID             NodeID
 	currentTerm    int32
 	votedFor       NodeID
-	logs           []*pb2.LogItem
+	logs           []*pb.LogItem
 	commitedLength int32
 
 	// Volatile
@@ -36,38 +35,38 @@ type Node struct {
 	ackedLength   map[NodeID]int32
 
 	mu        sync.RWMutex
-	peers     map[NodeID]string
+	nodes     map[NodeID]string
 	transport *Transport
+	cache     *storage.LRUCache
 
 	electionTimer   *time.Timer
 	leaderFailTimer *time.Timer
 
-	voteResponseChannel   chan *pb2.VoteResponse
-	ClientMessageChannel  chan string // Messages from client
-	logResponseChannel    chan *pb2.LogResponse
-	quitChannel           chan struct{}
 	ClientResponseChannel chan string
+	ClientRequestChannel  chan string
+	voteResponseChannel   chan *pb.VoteResponse
+	logResponseChannel    chan *pb.LogResponse
+	quitChannel           chan struct{}
 
-	cache *storage.LRUCache
-	pb2.UnimplementedRaftServer
+	pb.UnimplementedRaftServer
 }
 
-func NewNode(peers map[NodeID]string, id NodeID) *Node {
+func NewNode(nodes map[NodeID]string, id NodeID) *Node {
 	return &Node{
 		ID:                    id,
 		votedFor:              -1,
-		logs:                  make([]*pb2.LogItem, 0),
+		logs:                  make([]*pb.LogItem, 0),
 		currentRole:           Follower,
 		currentLeader:         -1,
 		votesReceived:         make(map[NodeID]bool),
 		sentLength:            make(map[NodeID]int32),
 		ackedLength:           make(map[NodeID]int32),
 		mu:                    sync.RWMutex{},
-		peers:                 peers,
-		transport:             NewTransport(id, peers),
-		voteResponseChannel:   make(chan *pb2.VoteResponse),
-		ClientMessageChannel:  make(chan string),
-		logResponseChannel:    make(chan *pb2.LogResponse),
+		nodes:                 nodes,
+		transport:             NewTransport(id, nodes),
+		voteResponseChannel:   make(chan *pb.VoteResponse),
+		ClientRequestChannel:  make(chan string),
+		logResponseChannel:    make(chan *pb.LogResponse),
 		quitChannel:           make(chan struct{}),
 		ClientResponseChannel: make(chan string),
 		cache:                 storage.NewLRUCache(100),
@@ -102,7 +101,7 @@ func (rf *Node) Start(ln net.Listener) {
 			go rf.handleVoteResponse(voteRes)
 		case logRes := <-rf.logResponseChannel:
 			go rf.handleLogResponse(logRes)
-		case msg := <-rf.ClientMessageChannel:
+		case msg := <-rf.ClientRequestChannel:
 			go rf.handleClientRequest(msg)
 		}
 	}
@@ -113,7 +112,7 @@ func (rf *Node) Quit() {
 	rf.quitChannel <- struct{}{}
 }
 
-func (rf *Node) VoteRequest(ctx context.Context, args *pb2.VoteRequestArgs) (*pb2.VoteResponse, error) {
+func (rf *Node) VoteRequest(ctx context.Context, args *pb.VoteRequestArgs) (*pb.VoteResponse, error) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
@@ -130,7 +129,7 @@ func (rf *Node) VoteRequest(ctx context.Context, args *pb2.VoteRequestArgs) (*pb
 	}
 	logOK := args.LogTerm > lastTerm || (args.LogTerm == lastTerm && args.LogLength >= int32(logLen))
 
-	reply := &pb2.VoteResponse{
+	reply := &pb.VoteResponse{
 		Term:    rf.currentTerm,
 		Granted: false,
 		VoterId: int32(rf.ID),
@@ -142,7 +141,7 @@ func (rf *Node) VoteRequest(ctx context.Context, args *pb2.VoteRequestArgs) (*pb
 	return reply, nil
 }
 
-func (rf *Node) LogRequest(ctx context.Context, args *pb2.LogRequestArgs) (*pb2.LogResponse, error) {
+func (rf *Node) LogRequest(ctx context.Context, args *pb.LogRequestArgs) (*pb.LogResponse, error) {
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
@@ -160,7 +159,7 @@ func (rf *Node) LogRequest(ctx context.Context, args *pb2.LogRequestArgs) (*pb2.
 	logOK := (len(rf.logs) >= int(args.PrefixLen)) &&
 		(args.PrefixLen == 0 || rf.logs[args.PrefixLen-1].Term == args.PrefixTerm)
 
-	res := &pb2.LogResponse{
+	res := &pb.LogResponse{
 		FollowerID: int32(rf.ID),
 		Term:       rf.currentTerm,
 		AckLen:     0,
@@ -176,18 +175,17 @@ func (rf *Node) LogRequest(ctx context.Context, args *pb2.LogRequestArgs) (*pb2.
 }
 
 func (rf *Node) handleClientRequest(msg string) {
-	log.Println("here in client req")
 	rf.mu.Lock()
 	defer rf.mu.Unlock()
 
 	fmt.Printf("[Node %d] Received Message From Client\n", rf.ID)
 	if rf.currentRole == Leader {
-		rf.logs = append(rf.logs, &pb2.LogItem{
+		rf.logs = append(rf.logs, &pb.LogItem{
 			Message: msg,
 			Term:    rf.currentTerm,
 		})
 		rf.ackedLength[rf.ID] = int32(len(rf.logs))
-		for followerID := range rf.peers {
+		for followerID := range rf.nodes {
 			if followerID == rf.ID {
 				continue
 			}

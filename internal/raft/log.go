@@ -91,12 +91,12 @@ func (rf *Node) commitLogEntries() {
 
 	for rf.commitedLength < int32(len(rf.logs)) {
 		acks := 0
-		for nodeID := range rf.peers {
+		for nodeID := range rf.nodes {
 			if rf.ackedLength[nodeID] > rf.commitedLength {
 				acks++
 			}
 		}
-		if acks > len(rf.peers)/2 {
+		if acks > len(rf.nodes)/2 {
 			res := rf.sendMessageToFSM(rf.logs[rf.commitedLength].Message)
 			rf.ClientResponseChannel <- res
 			rf.commitedLength++
@@ -112,7 +112,7 @@ func (rf *Node) sendHeartbeats() {
 
 	if rf.currentRole == Leader {
 		fmt.Printf("[Node %d] Sending Heartbeat\n", rf.ID)
-		for followerID := range rf.peers {
+		for followerID := range rf.nodes {
 			if followerID == rf.ID {
 				continue
 			}
