@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"sync"
+	"time"
 )
 
 type Client struct {
@@ -82,13 +83,12 @@ func main() {
 	if err != nil {
 		log.Fatalln("Client Error:", err.Error())
 	}
-	c.WG.Add(1)
+
 	go func() {
 		err := c.ReadData()
 		if err != nil {
 			fmt.Println("Error reading data:", err.Error())
 		}
-		c.WG.Done()
 	}()
 
 	err = c.Put(context.Background(), "name", fmt.Sprintf("Hardik"))
@@ -131,5 +131,6 @@ func main() {
 		fmt.Println("Client Error:", err.Error())
 	}
 
-	c.WG.Wait()
+	time.Sleep(time.Second)
+	log.Fatalln(c.Close())
 }

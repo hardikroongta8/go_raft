@@ -75,9 +75,9 @@ func NewNode(nodes map[NodeID]string, id NodeID) *Node {
 
 func (rf *Node) Start(ln net.Listener) {
 	go rf.transport.Start(rf, ln)
-	go rf.startElectionTimer()
-	go rf.startLeaderFailTimer()
-	time.Sleep(time.Millisecond * 100)
+
+	rf.startElectionTimer()
+	rf.startLeaderFailTimer()
 	heartbeatTimer := time.NewTicker(time.Second * 3)
 	defer heartbeatTimer.Stop()
 
@@ -86,14 +86,8 @@ func (rf *Node) Start(ln net.Listener) {
 		case <-rf.quitChannel:
 			return
 		case <-rf.leaderFailTimer.C:
-			rf.mu.RLock()
-			if rf.currentRole != Leader {
-				fmt.Printf("[Node %d] Leader Failed to send heartbeat\n", rf.ID)
-				go rf.startElection()
-			}
-			rf.mu.RUnlock()
+			go rf.handleLeaderFailed()
 		case <-rf.electionTimer.C:
-			fmt.Printf("[Node %d] Election Timer Expired\n", rf.ID)
 			go rf.startElection()
 		case <-heartbeatTimer.C:
 			go rf.sendHeartbeats()

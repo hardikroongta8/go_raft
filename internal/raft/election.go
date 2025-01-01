@@ -81,6 +81,15 @@ func (rf *Node) handleVoteResponse(res *pb.VoteResponse) {
 	}
 }
 
+func (rf *Node) handleLeaderFailed() {
+	rf.mu.RLock()
+	if rf.currentRole != Leader {
+		fmt.Printf("[Node %d] Leader Failed to send heartbeat\n", rf.ID)
+		go rf.startElection()
+	}
+	rf.mu.RUnlock()
+}
+
 func (rf *Node) startElectionTimer() {
 	electionTimeout := time.Duration(3000+rand.Intn(7000)) * time.Millisecond
 	fmt.Printf("[Node %d] Election Timeout: %v\n", rf.ID, electionTimeout)
