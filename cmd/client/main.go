@@ -5,11 +5,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/utils"
 	"log"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/hardikroongta8/go_raft/internal/utils"
 )
 
 type Client struct {
@@ -76,10 +77,10 @@ func (c *Client) Close() error {
 }
 
 func main() {
-	port := flag.Int("p", 8081, "port")
+	id := flag.Int("id", 1, "id")
 	flag.Parse()
-	fmt.Println("Connecting to server at port:", *port)
-	c, err := NewClient("localhost:" + fmt.Sprintf("%d", *port))
+	fmt.Printf("Connecting to server_%d\n", *id)
+	c, err := NewClient(fmt.Sprintf("server_%d:8080", *id))
 	if err != nil {
 		log.Fatalln("Client Error:", err.Error())
 	}
@@ -91,17 +92,17 @@ func main() {
 		}
 	}()
 
-	err = c.Put(context.Background(), "name", fmt.Sprintf("Hardik"))
+	err = c.Put(context.Background(), "name", "Hardik")
 	if err != nil {
 		fmt.Println("Client Error:", err.Error())
 	}
 
-	err = c.Put(context.Background(), "surname", fmt.Sprintf("Roongta"))
+	err = c.Put(context.Background(), "surname", "Roongta")
 	if err != nil {
 		fmt.Println("Client Error:", err.Error())
 	}
 
-	err = c.Put(context.Background(), "city", fmt.Sprintf("Guwahati"))
+	err = c.Put(context.Background(), "city", "Guwahati")
 	if err != nil {
 		fmt.Println("Client Error:", err.Error())
 	}
@@ -116,7 +117,7 @@ func main() {
 		fmt.Println("Client Error:", err.Error())
 	}
 
-	err = c.Put(context.Background(), "color", fmt.Sprintf("Red"))
+	err = c.Put(context.Background(), "color", "Red")
 	if err != nil {
 		fmt.Println("Client Error:", err.Error())
 	}

@@ -1,0 +1,36 @@
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: []
+    networks:
+      - go_raft
+
+  server_1:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    command: ["go_raft_server", "-id=1"]
+    networks:
+      - go_raft
+
+  server_2:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    command: ["go_raft_server", "-id=2"]
+    networks:
+      - go_raft
+
+  server_3:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    command: ["go_raft_server", "-id=3"]
+    networks:
+      - go_raft
+
+networks:
+  go_raft:
+    external: true

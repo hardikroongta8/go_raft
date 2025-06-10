@@ -3,12 +3,13 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/raft"
-	"github.com/hardikroongta8/go_raft/internal/utils"
-	"github.com/soheilhy/cmux"
 	"log"
 	"net"
 	"sync"
+
+	"github.com/hardikroongta8/go_raft/internal/raft"
+	"github.com/hardikroongta8/go_raft/internal/utils"
+	"github.com/soheilhy/cmux"
 )
 
 type CacheServer struct {
@@ -37,7 +38,7 @@ func NewCacheServer(port int, id raft.NodeID, raftNodes map[raft.NodeID]string) 
 
 func (s *CacheServer) Start(wg *sync.WaitGroup) {
 	defer wg.Done()
-	listener, err := net.Listen("tcp", "localhost:"+fmt.Sprintf("%d", s.port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", s.port))
 	if err != nil {
 		fmt.Printf("[Node %d] Error starting the listener: %s\n", s.rf.ID, err.Error())
 		return

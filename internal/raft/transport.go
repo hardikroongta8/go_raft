@@ -3,11 +3,11 @@ package raft
 import (
 	"context"
 	"fmt"
+	"net"
+
 	pb2 "github.com/hardikroongta8/go_raft/internal/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"net"
-	"sync"
 )
 
 type Transport struct {
@@ -15,7 +15,6 @@ type Transport struct {
 	clients map[NodeID]pb2.RaftClient // maps peerID to raft client
 	peers   map[NodeID]string         // maps peerID to address
 	id      NodeID                    // nodeID
-	mu      sync.Mutex
 }
 
 func NewTransport(id NodeID, peers map[NodeID]string) *Transport {
