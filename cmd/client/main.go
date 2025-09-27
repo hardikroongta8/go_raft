@@ -5,11 +5,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/utils"
 	"log"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/hardikroongta8/go_raft/internal/utils"
 )
 
 type Client struct {

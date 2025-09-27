@@ -3,6 +3,7 @@ package raft
 import (
 	"context"
 	"fmt"
+
 	"github.com/hardikroongta8/go_raft/internal/pb"
 )
 

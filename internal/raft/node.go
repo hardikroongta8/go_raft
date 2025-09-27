@@ -3,11 +3,12 @@ package raft
 import (
 	"context"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/pb"
-	"github.com/hardikroongta8/go_raft/internal/storage"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/hardikroongta8/go_raft/internal/pb"
+	"github.com/hardikroongta8/go_raft/internal/storage"
 )
 
 type State string

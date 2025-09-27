@@ -3,12 +3,13 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/raft"
-	"github.com/hardikroongta8/go_raft/internal/utils"
-	"github.com/soheilhy/cmux"
 	"log"
 	"net"
 	"sync"
+
+	"github.com/hardikroongta8/go_raft/internal/raft"
+	"github.com/hardikroongta8/go_raft/internal/utils"
+	"github.com/soheilhy/cmux"
 )
 
 type CacheServer struct {

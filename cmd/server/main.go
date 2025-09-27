@@ -4,12 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/raft"
-	"github.com/hardikroongta8/go_raft/internal/server"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/hardikroongta8/go_raft/internal/raft"
+	"github.com/hardikroongta8/go_raft/internal/server"
 )
 
 func main() {

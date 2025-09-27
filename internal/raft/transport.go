@@ -3,11 +3,12 @@ package raft
 import (
 	"context"
 	"fmt"
+	"net"
+	"sync"
+
 	pb2 "github.com/hardikroongta8/go_raft/internal/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"net"
-	"sync"
 )
 
 type Transport struct {

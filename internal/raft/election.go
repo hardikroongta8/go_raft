@@ -3,9 +3,10 @@ package raft
 import (
 	"context"
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/pb"
 	"math/rand"
 	"time"
+
+	"github.com/hardikroongta8/go_raft/internal/pb"
 )
 
 func (rf *Node) startElection() {

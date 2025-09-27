@@ -2,10 +2,11 @@ package server
 
 import (
 	"fmt"
-	"github.com/hardikroongta8/go_raft/internal/utils"
 	"io"
 	"net"
 	"sync"
+
+	"github.com/hardikroongta8/go_raft/internal/utils"
 )
 
 type Peer struct {

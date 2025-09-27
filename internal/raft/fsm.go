@@ -2,6 +2,7 @@ package raft
 
 import (
 	"fmt"
+
 	"github.com/hardikroongta8/go_raft/internal/utils"
 )
 
